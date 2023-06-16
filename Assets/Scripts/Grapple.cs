@@ -69,7 +69,7 @@ public class Grapple : MonoBehaviour
         else
         {
             //rigid.AddForce(directionLine*pullSpeed,ForceMode.VelocityChange);//dat van toc moi cho doi tuong ,khong quan trong van toc truoc day
-            rigid.velocity = directionLine * pullSpeed * 20;
+             rigid.velocity = directionLine * pullSpeed * 20;
             //rigid.AddForce((hook.transform.position - transform.position).normalized*pullSpeed,ForceMode.VelocityChange);//dat van toc moi cho doi tuong ,khong quan trong van toc truoc day
             //rigid.AddForce((hook.transform.position - transform.position).normalized*20);//dat van toc moi cho doi tuong ,khong quan trong van toc truoc day
         }
