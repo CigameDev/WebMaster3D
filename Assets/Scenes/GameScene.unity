@@ -253,7 +253,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pullSpeed: 0.5
-  stopDistance: 1
+  stopDistance: 2
   hookPrefab: {fileID: 2990095231095184719, guid: 406800a809fde964fb2ee57ebd24f3d5, type: 3}
   shootTransform: {fileID: 441375326}
 --- !u!1 &412841415
