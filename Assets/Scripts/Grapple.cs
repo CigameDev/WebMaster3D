@@ -64,7 +64,8 @@ public class Grapple : MonoBehaviour
         if (!pulling || hook == null) return;
         if (Vector3.Distance(transform.position, hook.transform.position) <= stopDistance)//neu khoang cach nho hon stopDistance pha huy cai moc luon 
         {
-            DestroyHook();
+            //DestroyHook();
+            //pulling = false;
         }
         else
         {
@@ -78,8 +79,18 @@ public class Grapple : MonoBehaviour
     public void StartPull()
     {
         pulling = true;
+        rigid.useGravity = true;
     }    
-
+    public void EndPull()
+    {
+        pulling = false;
+        rigid.useGravity = false;
+        if (hook != null)
+        {
+            Destroy(hook.gameObject);
+        }
+        hook = null;
+    }    
     private void DestroyHook()
     {
         if (hook == null) return;
@@ -104,6 +115,7 @@ public class Grapple : MonoBehaviour
         if ((LayerMask.GetMask("Grapple") & 1 << col.gameObject.layer) > 0)
         {
             //rigid.isKinematic = true;
+            EndPull();
         }    
     }
 }

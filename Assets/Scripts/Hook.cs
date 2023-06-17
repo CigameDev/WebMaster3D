@@ -51,4 +51,8 @@ public class Hook : MonoBehaviour
             grapple.StartPull();
         }    
     }
+    public void DestroyHook()
+    {
+        Destroy(this.gameObject);
+    }    
 }
