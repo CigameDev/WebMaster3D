@@ -8,22 +8,25 @@ using UnityEngine;
 public class Grapple : MonoBehaviour
 {
     [SerializeField] float pullSpeed = 0.5f;
-    [SerializeField] float stopDistance = 1f;
     [SerializeField] GameObject hookPrefab;
     [SerializeField] Transform shootTransform;
+    [SerializeField] LayerMask grapple;
     public Transform _shoot => shootTransform;
     [SerializeField] Camera cam;
     private Vector3 startPoint;
     private Vector3 endPoint;
     private Vector3 directionLine;
     private float startPlayerY;
-    private bool canStopPull;
+    private Vector3 hitPoint;
+    private string nameObject;
     Hook hook;
     bool pulling;
+    
     Rigidbody rigid;
     private void Start()
     {
         rigid = GetComponent<Rigidbody>();
+        rigid.useGravity = false;
         pulling = false;
         startPlayerY = transform.position.y;
     }
@@ -33,6 +36,7 @@ public class Grapple : MonoBehaviour
         if(Input.GetMouseButtonDown(0))
         {
             startPoint = GetMousePosition();
+            DestroyHook();
         }
 
         if (hook == null && Input.GetMouseButtonUp(0))
@@ -43,31 +47,25 @@ public class Grapple : MonoBehaviour
             StopAllCoroutines();
             pulling = false;
             hook = Instantiate(hookPrefab, shootTransform.position, Quaternion.identity).GetComponent<Hook>();
-            hook.Inittialize(this, directionLine);
-            StartCoroutine(DestroyHookAfterLifetime());
+
+            //ban raycast de xac dinh diem bam dinh
+            RaycastHit hit;
+            if (Physics.Raycast(hook.transform.position, directionLine, out hit, Mathf.Infinity, grapple))
+            {
+                hitPoint = hit.point;
+                hook.stateHook = Hook.StateHook.MoveTarget;
+                nameObject = hit.collider.name;
+            }
+          
+            hook.Inittialize(this);
         }
-       
-
-        //if (hook ==null && Input.GetMouseButtonDown(0))//ban to nhen,chua dung logic lam vi khong su dung cach nay
-        //{
-        //    StopAllCoroutines();
-        //    pulling = false;
-        //    hook = Instantiate(hookPrefab,shootTransform.position,Quaternion.identity).GetComponent<Hook>();
-        //    hook.Inittialize(this, shootTransform);
-        //    StartCoroutine(DestroyHookAfterLifetime());
-        //}
-        //else if(hook !=null && Input.GetMouseButtonDown(1))//xem lai doan nay,pha huy hook khi nhan chuot phai
-        //{
-        //    DestroyHook();
-        //}
-
+        if (hook != null)
+        {
+            hook.MoveToTarget(this,hitPoint);
+        }
         if (!pulling || hook == null) return;
         rigid.velocity = directionLine * pullSpeed * 20;
 
-        //if (Vector3.Distance(transform.position, hook.transform.position) <= stopDistance)
-        //{
-        //    EndPull();
-        //}
 
     }
     private void LateUpdate()
@@ -78,19 +76,19 @@ public class Grapple : MonoBehaviour
     public void StartPull()
     {
         pulling = true;
-        //rigid.useGravity = true;
+        this.GetComponent<Collider>().isTrigger = true;
     }    
     public void EndPull()
     {
-        //this.transform.position = hook.transform.position;
+        this.GetComponent<Collider>().isTrigger = false;
         pulling = false;
-        rigid.useGravity = false;
         if (hook != null)
         {
             Destroy(hook.gameObject);
         }
         hook = null;
         rigid.velocity = Vector3.zero;
+        nameObject = "";
     }    
     private void DestroyHook()
     {
@@ -100,22 +98,19 @@ public class Grapple : MonoBehaviour
         hook = null;
     }   
     
-    private IEnumerator DestroyHookAfterLifetime()
-    {
-        yield return new WaitForSeconds(2f);
-        DestroyHook();
-    }
+   
     private Vector3 GetMousePosition()
     {
         Vector3 mousePos = Input.mousePosition;
         mousePos.z = 10f;
         return cam.ScreenToWorldPoint(mousePos);
     }
-    private void OnCollisionEnter(Collision col)
+
+  
+    private void OnTriggerEnter(Collider other)
     {
-        if ((LayerMask.GetMask("Grapple") & 1 << col.gameObject.layer) > 0)
+        if ((LayerMask.GetMask("Grapple") & 1 << other.gameObject.layer) > 0 && other.gameObject.name == nameObject)
         {
-            //rigid.isKinematic = true;
             EndPull();
         }
     }
