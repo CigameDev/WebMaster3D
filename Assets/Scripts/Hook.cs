@@ -35,7 +35,7 @@ public class Hook : MonoBehaviour
         Vector3[] positions = new Vector3[]//vi tri cua hook va vi tri player
         {
             transform.position,
-            grapple.transform.position
+            grapple._shoot.transform.position
         };
         lineRenderer.SetPositions(positions);
     }

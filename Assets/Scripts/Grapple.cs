@@ -11,6 +11,7 @@ public class Grapple : MonoBehaviour
     [SerializeField] float stopDistance = 1f;
     [SerializeField] GameObject hookPrefab;
     [SerializeField] Transform shootTransform;
+    public Transform _shoot => shootTransform;
     [SerializeField] Camera cam;
     private Vector3 startPoint;
     private Vector3 endPoint;
@@ -20,7 +21,6 @@ public class Grapple : MonoBehaviour
     Hook hook;
     bool pulling;
     Rigidbody rigid;
-
     private void Start()
     {
         rigid = GetComponent<Rigidbody>();
@@ -64,11 +64,11 @@ public class Grapple : MonoBehaviour
         if (!pulling || hook == null) return;
         rigid.velocity = directionLine * pullSpeed * 20;
 
-        //if(Vector3.Distance(transform.position,hook.transform.position) <= stopDistance  )
+        //if (Vector3.Distance(transform.position, hook.transform.position) <= stopDistance)
         //{
         //    EndPull();
         //}
-       
+
     }
     private void LateUpdate()
     {
@@ -78,7 +78,7 @@ public class Grapple : MonoBehaviour
     public void StartPull()
     {
         pulling = true;
-        rigid.useGravity = true;
+        //rigid.useGravity = true;
     }    
     public void EndPull()
     {
