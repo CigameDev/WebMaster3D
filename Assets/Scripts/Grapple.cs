@@ -11,10 +11,12 @@ public class Grapple : MonoBehaviour
     [SerializeField] float stopDistance = 1f;
     [SerializeField] GameObject hookPrefab;
     [SerializeField] Transform shootTransform;
-
+    [SerializeField] Camera cam;
     private Vector3 startPoint;
     private Vector3 endPoint;
     private Vector3 directionLine;
+    private float startPlayerY;
+    private bool canStopPull;
     Hook hook;
     bool pulling;
     Rigidbody rigid;
@@ -23,6 +25,7 @@ public class Grapple : MonoBehaviour
     {
         rigid = GetComponent<Rigidbody>();
         pulling = false;
+        startPlayerY = transform.position.y;
     }
 
     private void Update()
@@ -43,10 +46,7 @@ public class Grapple : MonoBehaviour
             hook.Inittialize(this, directionLine);
             StartCoroutine(DestroyHookAfterLifetime());
         }
-        else if (hook != null && Input.GetMouseButtonDown(1))//xem lai doan nay,pha huy hook khi nhan chuot phai
-        {
-            DestroyHook();
-        }
+       
 
         //if (hook ==null && Input.GetMouseButtonDown(0))//ban to nhen,chua dung logic lam vi khong su dung cach nay
         //{
@@ -63,20 +63,18 @@ public class Grapple : MonoBehaviour
 
         if (!pulling || hook == null) return;
         rigid.velocity = directionLine * pullSpeed * 20;
-        //if (Vector3.Distance(transform.position, hook.transform.position) <= stopDistance)//neu khoang cach nho hon stopDistance pha huy cai moc luon 
-        //{
-        //    //DestroyHook();
-        //    //pulling = false;
-        //}
-        //else
-        //{
-        //    //rigid.AddForce(directionLine*pullSpeed,ForceMode.VelocityChange);//dat van toc moi cho doi tuong ,khong quan trong van toc truoc day
-        //     rigid.velocity = directionLine * pullSpeed * 20;
-        //    //rigid.AddForce((hook.transform.position - transform.position).normalized*pullSpeed,ForceMode.VelocityChange);//dat van toc moi cho doi tuong ,khong quan trong van toc truoc day
-        //    //rigid.AddForce((hook.transform.position - transform.position).normalized*20);//dat van toc moi cho doi tuong ,khong quan trong van toc truoc day
-        //}
-    }
 
+        //if(Vector3.Distance(transform.position,hook.transform.position) <= stopDistance  )
+        //{
+        //    EndPull();
+        //}
+       
+    }
+    private void LateUpdate()
+    {
+        float posCamY = transform.position.y - startPlayerY;
+        cam.transform.position = new Vector3(cam.transform.position.x, posCamY, -10);
+    }
     public void StartPull()
     {
         pulling = true;
@@ -84,6 +82,7 @@ public class Grapple : MonoBehaviour
     }    
     public void EndPull()
     {
+        //this.transform.position = hook.transform.position;
         pulling = false;
         rigid.useGravity = false;
         if (hook != null)
@@ -91,6 +90,7 @@ public class Grapple : MonoBehaviour
             Destroy(hook.gameObject);
         }
         hook = null;
+        rigid.velocity = Vector3.zero;
     }    
     private void DestroyHook()
     {
@@ -109,7 +109,7 @@ public class Grapple : MonoBehaviour
     {
         Vector3 mousePos = Input.mousePosition;
         mousePos.z = 10f;
-        return Camera.main.ScreenToWorldPoint(mousePos);
+        return cam.ScreenToWorldPoint(mousePos);
     }
     private void OnCollisionEnter(Collision col)
     {
@@ -117,6 +117,6 @@ public class Grapple : MonoBehaviour
         {
             //rigid.isKinematic = true;
             EndPull();
-        }    
+        }
     }
 }
