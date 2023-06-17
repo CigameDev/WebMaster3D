@@ -62,18 +62,19 @@ public class Grapple : MonoBehaviour
         //}
 
         if (!pulling || hook == null) return;
-        if (Vector3.Distance(transform.position, hook.transform.position) <= stopDistance)//neu khoang cach nho hon stopDistance pha huy cai moc luon 
-        {
-            //DestroyHook();
-            //pulling = false;
-        }
-        else
-        {
-            //rigid.AddForce(directionLine*pullSpeed,ForceMode.VelocityChange);//dat van toc moi cho doi tuong ,khong quan trong van toc truoc day
-             rigid.velocity = directionLine * pullSpeed * 20;
-            //rigid.AddForce((hook.transform.position - transform.position).normalized*pullSpeed,ForceMode.VelocityChange);//dat van toc moi cho doi tuong ,khong quan trong van toc truoc day
-            //rigid.AddForce((hook.transform.position - transform.position).normalized*20);//dat van toc moi cho doi tuong ,khong quan trong van toc truoc day
-        }
+        rigid.velocity = directionLine * pullSpeed * 20;
+        //if (Vector3.Distance(transform.position, hook.transform.position) <= stopDistance)//neu khoang cach nho hon stopDistance pha huy cai moc luon 
+        //{
+        //    //DestroyHook();
+        //    //pulling = false;
+        //}
+        //else
+        //{
+        //    //rigid.AddForce(directionLine*pullSpeed,ForceMode.VelocityChange);//dat van toc moi cho doi tuong ,khong quan trong van toc truoc day
+        //     rigid.velocity = directionLine * pullSpeed * 20;
+        //    //rigid.AddForce((hook.transform.position - transform.position).normalized*pullSpeed,ForceMode.VelocityChange);//dat van toc moi cho doi tuong ,khong quan trong van toc truoc day
+        //    //rigid.AddForce((hook.transform.position - transform.position).normalized*20);//dat van toc moi cho doi tuong ,khong quan trong van toc truoc day
+        //}
     }
 
     public void StartPull()
