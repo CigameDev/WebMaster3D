@@ -9,15 +9,17 @@ public class Grapple : MonoBehaviour
 {
     [SerializeField] float pullSpeed = 0.5f;
     [SerializeField] GameObject hookPrefab;
-    [SerializeField] Transform shootTransform;
+    [SerializeField] Transform _shootTransform;
+    public Transform shootTransform => _shootTransform;
     [SerializeField] LayerMask grapple;
-    public Transform _shoot => shootTransform;
     [SerializeField] Camera cam;
     private Vector3 startPoint;
     private Vector3 endPoint;
     private Vector3 directionLine;
+    public Vector3 _directionLine => directionLine;
     private float startPlayerY;
     private Vector3 hitPoint;
+    public Vector3 _hitPoint => hitPoint;
     private string nameObject;
     Hook hook;
     bool pulling;
@@ -46,7 +48,7 @@ public class Grapple : MonoBehaviour
 
             StopAllCoroutines();
             pulling = false;
-            hook = Instantiate(hookPrefab, shootTransform.position, Quaternion.identity).GetComponent<Hook>();
+            hook = Instantiate(hookPrefab, _shootTransform.position, Quaternion.identity).GetComponent<Hook>();
 
             //ban raycast de xac dinh diem bam dinh
             RaycastHit hit;
@@ -81,12 +83,13 @@ public class Grapple : MonoBehaviour
     public void EndPull()
     {
         this.GetComponent<Collider>().isTrigger = false;
-        pulling = false;
-        if (hook != null)
-        {
-            Destroy(hook.gameObject);
-        }
-        hook = null;
+        //pulling = false;
+        //if (hook != null)
+        //{
+        //    Destroy(hook.gameObject);
+        //}
+        //hook = null;
+        DestroyHook();
         rigid.velocity = Vector3.zero;
         nameObject = "";
     }    
