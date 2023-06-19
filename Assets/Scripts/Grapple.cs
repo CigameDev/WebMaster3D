@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 /// <summary>
@@ -21,17 +22,32 @@ public class Grapple : MonoBehaviour
     private Vector3 hitPoint;
     public Vector3 _hitPoint => hitPoint;
     private string nameObject;
+    private Vector3 sizePlayer;
     Hook hook;
-    bool pulling;
+    public bool pulling { get; set; }
+
     
     Rigidbody rigid;
+
+    public enum GripDirection
+    {
+        None,
+        Left ,
+        Right,
+        Down,
+        Up
+    }
+    private GripDirection gripDir;
+    private GripDirection oldGrip;
     private void Start()
     {
         rigid = GetComponent<Rigidbody>();
         rigid.useGravity = false;
         pulling = false;
         startPlayerY = transform.position.y;
+        sizePlayer = GetComponent<BoxCollider>().bounds.size;
     }
+    
 
     private void Update()
     {
@@ -55,6 +71,22 @@ public class Grapple : MonoBehaviour
             if (Physics.Raycast(hook.transform.position, directionLine, out hit, Mathf.Infinity, grapple))
             {
                 hitPoint = hit.point;
+                if(hit.normal == new Vector3(1f,0f,0f))
+                {
+                    gripDir = GripDirection.Left;
+                }    
+                else if(hit.normal == new Vector3(-1f, 0f, 0f))
+                {
+                    gripDir = GripDirection.Right;
+                }
+                else if (hit.normal == new Vector3(0f, -1f, 0f))
+                {
+                    gripDir = GripDirection.Up;
+                }
+                else if (hit.normal == new Vector3(0f, 1f, 0f))
+                {
+                    gripDir = GripDirection.Down;
+                }
                 hook.stateHook = Hook.StateHook.MoveTarget;
                 nameObject = hit.collider.name;
             }
@@ -66,9 +98,7 @@ public class Grapple : MonoBehaviour
             hook.MoveToTarget(this,hitPoint);
         }
         if (!pulling || hook == null) return;
-        rigid.velocity = directionLine * pullSpeed * 20;
-
-
+        PullPlayer();
     }
     private void LateUpdate()
     {
@@ -83,15 +113,11 @@ public class Grapple : MonoBehaviour
     public void EndPull()
     {
         this.GetComponent<Collider>().isTrigger = false;
-        //pulling = false;
-        //if (hook != null)
-        //{
-        //    Destroy(hook.gameObject);
-        //}
-        //hook = null;
         DestroyHook();
         rigid.velocity = Vector3.zero;
         nameObject = "";
+        oldGrip = gripDir;
+        gripDir = GripDirection.None;
     }    
     private void DestroyHook()
     {
@@ -100,21 +126,53 @@ public class Grapple : MonoBehaviour
         Destroy(hook.gameObject);
         hook = null;
     }   
-    
-   
     private Vector3 GetMousePosition()
     {
         Vector3 mousePos = Input.mousePosition;
         mousePos.z = 10f;
         return cam.ScreenToWorldPoint(mousePos);
     }
-
   
     private void OnTriggerEnter(Collider other)
     {
         if ((LayerMask.GetMask("Grapple") & 1 << other.gameObject.layer) > 0 && other.gameObject.name == nameObject)
         {
+            RotatePlayer();
             EndPull();
         }
     }
+    private void RotatePlayer()
+    {
+        if (gripDir == GripDirection.None) return;
+        Vector3 newAngel = new Vector3(transform.rotation.x, transform.rotation.y, transform.rotation.z);
+
+        if (gripDir == GripDirection.Left)
+        {
+            newAngel = new Vector3(transform.rotation.x, 135f, transform.rotation.z);
+        }
+        else if (gripDir == GripDirection.Right)
+        {
+            newAngel = new Vector3(transform.rotation.x, 315f, transform.rotation.z);
+        }
+        else if (gripDir == GripDirection.Down)
+        {
+            newAngel = new Vector3(transform.rotation.x, transform.rotation.y, 0f);
+            if (oldGrip == GripDirection.Up)
+            {
+                this.transform.position = new Vector3(transform.position.x, transform.position.y - sizePlayer.y, transform.position.z);
+            }
+        }
+        else if (gripDir == GripDirection.Up)
+        {
+            newAngel = new Vector3(transform.rotation.x, transform.rotation.y, 180f);
+            this.transform.position = new Vector3(transform.position.x,transform.position.y +sizePlayer.y,transform.position.z);
+
+        }
+        this.transform.rotation = Quaternion.Euler(newAngel);
+    }
+
+    private void PullPlayer()
+    {
+        rigid.velocity = directionLine * pullSpeed * 20;
+    }    
 }

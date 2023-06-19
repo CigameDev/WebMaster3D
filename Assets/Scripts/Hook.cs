@@ -13,8 +13,11 @@ public class Hook : MonoBehaviour
     int percision = 40;//so diem cua day
     float moveTime = 0f;
     float ropeProgressionSpeed = 10f;
-    bool strightLine = false;
+    float waveSize = 0f;
+    float startWaveSize = 2f;
+    float straightenLineSpeed = 5;
     public AnimationCurve cure;
+    public AnimationCurve ropeProgressionCurve;
     public enum StateHook
     {
         None =0,
@@ -26,71 +29,59 @@ public class Hook : MonoBehaviour
     {
         this.grapple = grapple;
         lineRenderer = GetComponent<LineRenderer>();
-        //lineRenderer.positionCount = percision;
-        //LinePointsToFirePoint();
+        lineRenderer.positionCount = percision;
+        waveSize = startWaveSize;
     }
     private void Update()
     {
-        Vector3[] positions = new Vector3[]//vi tri cua hook va vi tri shoot
-        {
-            transform.position,
-            grapple.shootTransform.transform.position
-        };
-        lineRenderer.SetPositions(positions);
-
-        //moveTime += Time.deltaTime;
-        //DrawRopeWaves();
-
+        moveTime += Time.deltaTime;
+        DrawRope();
     }
   
     public void MoveToTarget(Grapple grapple, Vector3 target)
     {
         if (stateHook != StateHook.MoveTarget) return;
-        //DrawRopeWaves();
         transform.position = Vector3.MoveTowards(transform.position, target, Time.deltaTime * ropeProgressionSpeed);
 
         if (Vector3.Distance(transform.position, target) < 0.2f)
         {
             transform.position = target;
-            stateHook = StateHook.Frozen;
+            stateHook = StateHook.None;
             grapple.StartPull();
         }
     }
     
-    public void LinePointsToFirePoint()
-    {
-        if (grapple == null) return;
-        for(int i=0;i<percision;i++)
-        {
-            lineRenderer.SetPosition(i, grapple.shootTransform.transform.position);
-        }    
-    }    
-
     private void DrawRopeWaves()
     {
         if(grapple == null) return;
         for(int i =0;i< percision;i++)
         {
             float delta = (float)i / ((float)percision - 1f);
-            Vector2 offset = Vector2.Perpendicular((Vector2)grapple._directionLine).normalized * cure.Evaluate(delta);
+            Vector2 offset = Vector2.Perpendicular((Vector2)grapple._directionLine).normalized * cure.Evaluate(delta) *waveSize;
             Vector2 targetPosition = Vector2.Lerp(grapple.shootTransform.position, transform.position, delta) + offset;
-            Vector2 currentPosition = Vector2.Lerp(grapple.shootTransform.position, targetPosition, cure.Evaluate(moveTime)*ropeProgressionSpeed);
+            Vector2 currentPosition = Vector2.Lerp(grapple.shootTransform.position, targetPosition, ropeProgressionCurve.Evaluate(moveTime)*ropeProgressionSpeed);
+
             //lineRenderer.SetPosition(i, new Vector3(targetPosition.x,targetPosition.y,transform.position.z));
             lineRenderer.SetPosition(i, new Vector3(currentPosition.x,currentPosition.y,transform.position.z));
-            //lineRenderer.SetPosition(i, currentPosition);
         }    
     }    
     private void DrawRopeNoWaves()
     {
+        lineRenderer.positionCount = 2;
         lineRenderer.SetPosition(0, grapple.shootTransform.transform.position);
         lineRenderer.SetPosition(1, this.transform.position);
     }    
 
     private void DrawRope()
     {
-        if(!strightLine)
-        {
 
+        if(stateHook == StateHook.None)
+        {
+            DrawRopeNoWaves();
+        }   
+        else
+        {
+            DrawRopeWaves();
         }    
     }    
 }
