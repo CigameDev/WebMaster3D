@@ -7517,6 +7517,7 @@ GameObject:
   - component: {fileID: 7716482795053425275}
   - component: {fileID: 7716482795053425274}
   - component: {fileID: 7716482795053425273}
+  - component: {fileID: 7716482795053425276}
   m_Layer: 0
   m_Name: PlayerBase
   m_TagString: Untagged
@@ -7536,7 +7537,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c16bc11ff22ca1a49a7544b1e97bd73a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pullSpeed: 0.5
+  pullSpeed: 10
   hookPrefab: {fileID: 2990095231095184719, guid: 406800a809fde964fb2ee57ebd24f3d5, type: 3}
   _shootTransform: {fileID: 1966119228}
   grapple:
@@ -7572,6 +7573,21 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.1, y: 0.35, z: 0.1}
   m_Center: {x: 0, y: 0.18, z: 0}
+--- !u!114 &7716482795053425276
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7716482795053425272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7923633b44fd6144392b8aaf7c5c1d32, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mainCamera: {fileID: 963194227}
+  startYFollow: 0
+  endYFollow: 17
 --- !u!137 &7724464001272494661
 SkinnedMeshRenderer:
   m_ObjectHideFlags: 0

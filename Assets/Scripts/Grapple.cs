@@ -8,7 +8,7 @@ using UnityEngine;
 /// </summary>
 public class Grapple : MonoBehaviour
 {
-    [SerializeField] float pullSpeed = 0.5f;
+    [SerializeField] float pullSpeed = 10f;
     [SerializeField] GameObject hookPrefab;
     [SerializeField] Transform _shootTransform;
     public Transform shootTransform => _shootTransform;
@@ -18,7 +18,6 @@ public class Grapple : MonoBehaviour
     private Vector3 endPoint;
     private Vector3 directionLine;
     public Vector3 _directionLine => directionLine;
-    private float startPlayerY;
     private Vector3 hitPoint;
     public Vector3 _hitPoint => hitPoint;
     private string nameObject;
@@ -44,7 +43,6 @@ public class Grapple : MonoBehaviour
         rigid = GetComponent<Rigidbody>();
         rigid.useGravity = false;
         pulling = false;
-        startPlayerY = transform.position.y;
         sizePlayer = GetComponent<BoxCollider>().bounds.size;
     }
     
@@ -71,22 +69,7 @@ public class Grapple : MonoBehaviour
             if (Physics.Raycast(hook.transform.position, directionLine, out hit, Mathf.Infinity, grapple))
             {
                 hitPoint = hit.point;
-                if(hit.normal == new Vector3(1f,0f,0f))
-                {
-                    gripDir = GripDirection.Left;
-                }    
-                else if(hit.normal == new Vector3(-1f, 0f, 0f))
-                {
-                    gripDir = GripDirection.Right;
-                }
-                else if (hit.normal == new Vector3(0f, -1f, 0f))
-                {
-                    gripDir = GripDirection.Up;
-                }
-                else if (hit.normal == new Vector3(0f, 1f, 0f))
-                {
-                    gripDir = GripDirection.Down;
-                }
+                GetGripDirection(hit);
                 hook.stateHook = Hook.StateHook.MoveTarget;
                 nameObject = hit.collider.name;
             }
@@ -97,14 +80,9 @@ public class Grapple : MonoBehaviour
         {
             hook.MoveToTarget(this,hitPoint);
         }
-        if (!pulling || hook == null) return;
         PullPlayer();
     }
-    private void LateUpdate()
-    {
-        float posCamY = transform.position.y - startPlayerY;
-        cam.transform.position = new Vector3(cam.transform.position.x, posCamY, -10);
-    }
+  
     public void StartPull()
     {
         pulling = true;
@@ -141,22 +119,24 @@ public class Grapple : MonoBehaviour
             EndPull();
         }
     }
+
+    // Rotate Player khi Player bam vao vi tri moi
     private void RotatePlayer()
     {
         if (gripDir == GripDirection.None) return;
-        Vector3 newAngel = new Vector3(transform.rotation.x, transform.rotation.y, transform.rotation.z);
+        Vector3 newAngel = new Vector3(transform.rotation.x,transform.rotation.y,transform.rotation.z);
 
         if (gripDir == GripDirection.Left)
         {
-            newAngel = new Vector3(transform.rotation.x, 135f, transform.rotation.z);
+            newAngel = new Vector3(newAngel.x, 135f, newAngel.z);
         }
         else if (gripDir == GripDirection.Right)
         {
-            newAngel = new Vector3(transform.rotation.x, 315f, transform.rotation.z);
+            newAngel = new Vector3(newAngel.x, 315f, newAngel.z);
         }
         else if (gripDir == GripDirection.Down)
         {
-            newAngel = new Vector3(transform.rotation.x, transform.rotation.y, 0f);
+            newAngel = new Vector3(newAngel.x, newAngel.y, 0f);
             if (oldGrip == GripDirection.Up)
             {
                 this.transform.position = new Vector3(transform.position.x, transform.position.y - sizePlayer.y, transform.position.z);
@@ -164,15 +144,38 @@ public class Grapple : MonoBehaviour
         }
         else if (gripDir == GripDirection.Up)
         {
-            newAngel = new Vector3(transform.rotation.x, transform.rotation.y, 180f);
+            newAngel = new Vector3(newAngel.x, newAngel.y, 180f);
             this.transform.position = new Vector3(transform.position.x,transform.position.y +sizePlayer.y,transform.position.z);
 
         }
         this.transform.rotation = Quaternion.Euler(newAngel);
     }
 
+    //lay vi tri se bam tiep theo dua vao raycast
+    private void GetGripDirection(RaycastHit hit)
+    {
+        if (hit.normal == new Vector3(1f, 0f, 0f))
+        {
+            gripDir = GripDirection.Left;
+        }
+        else if (hit.normal == new Vector3(-1f, 0f, 0f))
+        {
+            gripDir = GripDirection.Right;
+        }
+        else if (hit.normal == new Vector3(0f, -1f, 0f))
+        {
+            gripDir = GripDirection.Up;
+        }
+        else if (hit.normal == new Vector3(0f, 1f, 0f))
+        {
+            gripDir = GripDirection.Down;
+        }
+    }    
+
+    //keo player ve hitpoint
     private void PullPlayer()
     {
-        rigid.velocity = directionLine * pullSpeed * 20;
+        if (!pulling || hook == null) return;
+        rigid.velocity = directionLine * pullSpeed;
     }    
 }
