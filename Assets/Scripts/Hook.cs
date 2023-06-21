@@ -83,5 +83,41 @@ public class Hook : MonoBehaviour
         {
             DrawRopeWaves();
         }    
-    }    
+    }
+
+    //void DrawRope1()
+    //{
+    //    if (stateHook == StateHook.None)
+    //    {
+    //        if (lineRenderer.GetPosition(percision - 1).x == grapplingGun.grapplePoint.x)
+    //        {
+    //            stateHook = StateHook.Frozen;
+    //        }
+    //        else
+    //        {
+    //            DrawRopeWaves();
+    //        }
+    //    }
+    //    else
+    //    {
+    //        if (!isGrappling)
+    //        {
+    //            grapplingGun.Grapple();
+    //            isGrappling = true;
+    //        }
+    //        if (waveSize > 0)
+    //        {
+    //            waveSize -= Time.deltaTime * straightenLineSpeed;
+    //            DrawRopeWaves();
+    //        }
+    //        else
+    //        {
+    //            waveSize = 0;
+
+    //            if (lineRenderer.positionCount != 2) { lineRenderer.positionCount = 2; }
+
+    //            DrawRopeNoWaves();
+    //        }
+    //    }
+    //}
 }
