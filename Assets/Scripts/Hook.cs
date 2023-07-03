@@ -61,8 +61,8 @@ public class Hook : MonoBehaviour
             Vector2 targetPosition = Vector2.Lerp(grapple.shootTransform.position, transform.position, delta) + offset;
             Vector2 currentPosition = Vector2.Lerp(grapple.shootTransform.position, targetPosition, ropeProgressionCurve.Evaluate(moveTime)*ropeProgressionSpeed);
 
-            //lineRenderer.SetPosition(i, new Vector3(targetPosition.x,targetPosition.y,transform.position.z));
-            lineRenderer.SetPosition(i, new Vector3(currentPosition.x,currentPosition.y,transform.position.z));
+            lineRenderer.SetPosition(i, new Vector3(targetPosition.x,targetPosition.y,transform.position.z));
+            //lineRenderer.SetPosition(i, new Vector3(currentPosition.x,currentPosition.y,transform.position.z));
         }    
     }    
     private void DrawRopeNoWaves()
