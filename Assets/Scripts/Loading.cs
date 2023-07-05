@@ -12,7 +12,7 @@ public class Loading : MonoBehaviour
     public static Loading Instance { get; private set; }
     [SerializeField] GameObject loaderPopup;
     [SerializeField] Image progressBar;
-
+    
     private void Awake()
     {
         if(Instance ==null)
@@ -28,9 +28,9 @@ public class Loading : MonoBehaviour
 
     private void Start()
     {
-        LoadScene("GameScene", 3);
+        //LoadScene("GameScene", 5);
     }
-    public  async void LoadScene(string sceneName,int maxTime,List<bool>action=null)
+    public  async void LoadScene(string sceneName,int maxTime,List<Func<bool>>action=null)
     {
         float time = 0f;
         var scene = SceneManager.LoadSceneAsync(sceneName);
@@ -41,24 +41,24 @@ public class Loading : MonoBehaviour
         {
             while (time < maxTime)
             {
-                await Task.Delay(100);
-                time += 0.1f;
+                await Task.Delay(50);
+                time += 0.05f;
                 progressBar.fillAmount = time / maxTime;
             }
         }
         else
         {
-            bool allActionsDone = action.All(a => a);
+            bool allActionsDone = action.All(a => a.Invoke());
             while (time < maxTime && !allActionsDone)
             {
-                await Task.Delay(100);
-                time += 0.1f;
+                await Task.Delay(50);
+                time += 0.05f;
                 progressBar.fillAmount = time / maxTime;
-                allActionsDone = action.All(a => a);
+                allActionsDone = action.All(a => a.Invoke());
             }
         }
         progressBar.fillAmount = 1f;
-        await Task.Delay(100);
+        await Task.Delay(500);
         scene.allowSceneActivation = true;
         loaderPopup.SetActive(false);
     }    
@@ -71,7 +71,7 @@ public class Loading : MonoBehaviour
 
         do
         {
-            await Task.Delay(100);
+            await Task.Delay(50);
             progressBar.fillAmount = scene.progress;
         }while(scene.progress > 0.9f);
 

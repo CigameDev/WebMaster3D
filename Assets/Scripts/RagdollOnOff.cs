@@ -12,19 +12,12 @@ public class RagdollOnOff : MonoBehaviour
     private void Start()
     {
         GetRagdollBits();
-        RagdollModeOff();
+        //RagdollModeOff();
+        RagdollModeOn();
     }
     private void Update()
     {
         
-    }
-    private void OnCollisionEnter(Collision collision)
-    {
-        //trong vi du nay this guy va cham voi vien da hay vien dan ,chuyen trang thai thanh ragdollModeOn
-        if(collision.gameObject.tag =="Bullet")
-        {
-            RagdollModeOn();
-        }    
     }
    
     private void GetRagdollBits()

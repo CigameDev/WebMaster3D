@@ -139,13 +139,13 @@ public class Grapple : MonoBehaviour
             newAngel = new Vector3(newAngel.x, newAngel.y, 0f);
             if (oldGrip == GripDirection.Up)
             {
-                this.transform.position = new Vector3(transform.position.x, transform.position.y - sizePlayer.y, transform.position.z);
+                this.transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z);
             }
         }
         else if (gripDir == GripDirection.Up)
         {
             newAngel = new Vector3(newAngel.x, newAngel.y, 180f);
-            this.transform.position = new Vector3(transform.position.x,transform.position.y +sizePlayer.y,transform.position.z);
+            this.transform.position = new Vector3(transform.position.x,transform.position.y,transform.position.z);
 
         }
         this.transform.rotation = Quaternion.Euler(newAngel);
