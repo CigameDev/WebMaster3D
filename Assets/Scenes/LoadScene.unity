@@ -296,7 +296,7 @@ GameObject:
   - component: {fileID: 408029752}
   - component: {fileID: 408029751}
   m_Layer: 5
-  m_Name: Fill
+  m_Name: ProgressBar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -713,8 +713,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d47588565818474dae2e5365c26d1f1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fillImage: {fileID: 408029751}
-  LoadingPopup: {fileID: 33449167}
-  _maxTimeLoading: 30
-  _numberCondition: 0
-  _conditionDone: 
+  loaderPopup: {fileID: 33449167}
+  progressBar: {fileID: 408029751}

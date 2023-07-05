@@ -4,55 +4,79 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System;
+using System.Threading.Tasks;
+using System.Linq;
 
 public class Loading : MonoBehaviour
 {
     public static Loading Instance { get; private set; }
-    [SerializeField] Image fillImage;
-    [SerializeField] GameObject LoadingPopup;
-    [SerializeField] float _maxTimeLoading = 0f;
-    [SerializeField] int _numberCondition = 0;
-    [SerializeField]List<bool>_conditionDone = new List<bool>();
-
-    Action<List<bool>> _onDone = null;
-    float _loadingMaxvalue;
-    bool _isLoadingStart = false;
-
-    
+    [SerializeField] GameObject loaderPopup;
+    [SerializeField] Image progressBar;
 
     private void Awake()
     {
-        Instance = this;
-        DontDestroyOnLoad(gameObject);
-        fillImage.fillAmount = 0;
-        
-    }
-    
-    public Loading Init(Action<List<bool>> onDone = null)
-    {
-        for(int i=0;i<_numberCondition;i++)
+        if(Instance ==null)
         {
-            _conditionDone.Add(false);
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }    
+        else
+        {
+            Destroy(gameObject);
+        }    
+    }
+
+    private void Start()
+    {
+        LoadScene("GameScene", 3);
+    }
+    public  async void LoadScene(string sceneName,int maxTime,List<bool>action=null)
+    {
+        float time = 0f;
+        var scene = SceneManager.LoadSceneAsync(sceneName);
+        scene.allowSceneActivation = false;
+        loaderPopup.SetActive(true);
+
+        if (action == null)
+        {
+            while (time < maxTime)
+            {
+                await Task.Delay(100);
+                time += 0.1f;
+                progressBar.fillAmount = time / maxTime;
+            }
         }
-        _loadingMaxvalue = 1f;
-        fillImage.fillAmount = 0f;
-
-
-
-        LoadingPopup.SetActive(true);
-        _isLoadingStart = true;
-        return this;
+        else
+        {
+            bool allActionsDone = action.All(a => a);
+            while (time < maxTime && !allActionsDone)
+            {
+                await Task.Delay(100);
+                time += 0.1f;
+                progressBar.fillAmount = time / maxTime;
+                allActionsDone = action.All(a => a);
+            }
+        }
+        progressBar.fillAmount = 1f;
+        await Task.Delay(100);
+        scene.allowSceneActivation = true;
+        loaderPopup.SetActive(false);
     }    
 
-    public Loading Init(int numberCondition,Action<List<bool>>onDone = null)
+    public async  void LoadSceneNormal(string sceneName)
     {
-        _numberCondition = numberCondition;
-        return Init(onDone);
-    }
-    private void Update()
-    {
-        //fillImage.fillAmount +=
-    }
+        var scene = SceneManager.LoadSceneAsync(sceneName);
+        scene.allowSceneActivation = false;
+        loaderPopup.SetActive(true);
 
+        do
+        {
+            await Task.Delay(100);
+            progressBar.fillAmount = scene.progress;
+        }while(scene.progress > 0.9f);
 
+        await Task.Delay(100);
+        scene.allowSceneActivation = true;
+        loaderPopup.SetActive(false);
+    }    
 }
